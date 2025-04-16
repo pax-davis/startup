@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoalGlider</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>GoalGlider</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#">Login</a>
+      <a href="#">Dashboard</a>
+    </nav>
+  </header>
+  <main>
+    <section id="login">
+      <h2>Login</h2>
+      <input type="text" placeholder="Username" id="username" />
+      <button onclick="login()">Login</button>
+    </section>
+    <section id="goal-section">
+      <h2>My Goals</h2>
+      <ul id="goal-list"></ul>
+      <input type="text" id="new-goal" placeholder="New Goal" />
+      <button onclick="addGoal()">Add Goal</button>
+    </section>
+  </main>
+  <footer>
+    <p>© 2025 GoalGlider</p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
