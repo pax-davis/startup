@@ -1,0 +1,1 @@
+const express = require('express'); const router = express.Router(); router.get('/goals', (req, res) => res.json([{ goal: 'Read 10 books', progress: 30 }])); router.post('/goals', (req, res) => res.status(201).send('Goal created')); module.exports = router;
