@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Startup - GoalGlider</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a href="home.html">Home</a>
+    <a href="play.html">Play</a>
+    <a href="scores.html">Scores</a>
+    <a href="about.html">About</a>
+    <a href="goalglider.html">Startup - GoalGlider</a>
+  </nav>
+
+  <div class="login-container" id="login-section">
+    <h1>Login to GoalGlider</h1>
+    <input type="text" id="ggUser" placeholder="Enter your name">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="dashboard" class="scores-container" style="display:none;">
+    <h2>Welcome back, <span id="displayUser"></span>!</h2>
+    <input type="text" id="goalInput" placeholder="Add a new goal">
+    <button onclick="addGoal()">Add Goal</button>
+    <ul id="goalList"></ul>
+    <div class="quote" id="quote"></div>
+    <h3>Live Feed</h3>
+    <div class="live-feed">
+      <p>Jess completed 'Run A Marathon'</p>
+      <p>Max added a new goal: 'Study Study Study'</p>
+    </div>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    function login() {
+      const name = document.getElementById('ggUser').value.trim();
+      if (name) {
+        localStorage.setItem('ggUser', name);
+        loadDashboard();
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('ggUser');
+      location.reload();
+    }
+
+    function loadDashboard() {
+      const user = localStorage.getItem('ggUser');
+      if (!user) return;
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('displayUser').textContent = user;
+      loadGoals();
+      fetchQuote();
+    }
+
+    function addGoal() {
+      const user = localStorage.getItem('ggUser');
+      const text = document.getElementById('goalInput').value.trim();
+      if (!text) return;
+      const data = JSON.parse(localStorage.getItem('ggGoals') || "{}");
+      data[user] = data[user] || [];
+      data[user].push(text);
+      localStorage.setItem('ggGoals', JSON.stringify(data));
+      document.getElementById('goalInput').value = "";
+      loadGoals();
+    }
+
+    function loadGoals() {
+      const user = localStorage.getItem('ggUser');
+      const data = JSON.parse(localStorage.getItem('ggGoals') || "{}");
+      const goals = data[user] || [];
+      const list = document.getElementById('goalList');
+      list.innerHTML = "";
+      goals.forEach((goal, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          ${goal}
+          <button onclick="editGoal(${i})">Edit</button>
+          <button onclick="deleteGoal(${i})">Delete</button>`;
+        list.appendChild(li);
+      });
+    }
+
+    function editGoal(index) {
+      const user = localStorage.getItem('ggUser');
+      const data = JSON.parse(localStorage.getItem('ggGoals') || "{}");
+      const newGoal = prompt("Edit your goal:", data[user][index]);
+      if (newGoal !== null) {
+        data[user][index] = newGoal.trim();
+        localStorage.setItem('ggGoals', JSON.stringify(data));
+        loadGoals();
+      }
+    }
+
+    function deleteGoal(index) {
+      const user = localStorage.getItem('ggUser');
+      const data = JSON.parse(localStorage.getItem('ggGoals') || "{}");
+      data[user].splice(index, 1);
+      localStorage.setItem('ggGoals', JSON.stringify(data));
+      loadGoals();
+    }
+
+    function fetchQuote() {
+      fetch("https://zenquotes.io/api/random")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("quote").textContent =
+            '"' + data[0].q + '" – ' + data[0].a;
+        })
+        .catch(() => {
+          document.getElementById("quote").textContent =
+            "Stay focused and keep working on your goals.";
+        });
+    }
+
+    if (localStorage.getItem("ggUser")) loadDashboard();
+  </script>
+</body>
+</html>
