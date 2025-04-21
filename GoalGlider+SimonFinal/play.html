@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Simon Game</title>
+</head>
+<body>
+  <nav>
+    <a href="home.html">Home</a>
+    <a href="play.html">Play</a>
+    <a href="scores.html">Scores</a>
+    <a href="about.html">About</a>
+    <a href="goalglider.html">Startup - GoalGlider</a>
+  </nav>
+  <h1 id="level-title">Press Any Key or Tap Here to Start</h1>
+  <div class="scoreboard">
+    <p>Current Score: <span id="current-score">0</span></p>
+    <p>High Score: <span id="high-score">0</span></p>
+  </div>
+  <div class="container">
+    <div class="btn green" id="green"></div>
+    <div class="btn red" id="red"></div>
+    <div class="btn yellow" id="yellow"></div>
+    <div class="btn blue" id="blue"></div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

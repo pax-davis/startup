@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Startup - GoalGlider</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a href="home.html">Home</a>
+    <a href="play.html">Play</a>
+    <a href="scores.html">Scores</a>
+    <a href="about.html">About</a>
+    <a href="goalglider.html">Startup - GoalGlider</a>
+  </nav>
+
+  <div class="login-container" id="login-section">
+    <h1>Login to GoalGlider</h1>
+    <input type="text" id="ggUser" placeholder="Enter your name">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="dashboard" class="scores-container" style="display:none;">
+    <h2>Welcome back, <span id="displayUser"></span>!</h2>
+    <input type="text" id="goalInput" placeholder="Add a new goal">
+    <button onclick="addGoal()">Add Goal</button>
+    <ul id="goalList"></ul>
+    <div class="quote" id="quote"></div>
+    <h3>Live Feed</h3>
+    <div class="live-feed">
+      <p>Jess completed 'Run A Marathon'</p>
+      <p>Max added a new goal: 'Study Study Study'</p>
+    </div>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    const backendUrl = "http://34.229.179.169:3001";
+  
+    function login() {
+      const name = document.getElementById('ggUser').value.trim();
+      if (name) {
+        localStorage.setItem('ggUser', name);
+        loadDashboard();
+      }
+    }
+  
+    function logout() {
+      localStorage.removeItem('ggUser');
+      location.reload();
+    }
+  
+    function loadDashboard() {
+      const user = localStorage.getItem('ggUser');
+      if (!user) return;
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('displayUser').textContent = user;
+      loadGoals();
+      fetchQuote();
+    }
+  
+    async function addGoal() {
+      const user = localStorage.getItem('ggUser');
+      const text = document.getElementById('goalInput').value.trim();
+      if (!text) return;
+      await fetch(`${backendUrl}/api/goals`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: text, description: "", userId: user })
+      });
+      document.getElementById('goalInput').value = "";
+      loadGoals();
+    }
+  
+    async function loadGoals() {
+      const user = localStorage.getItem('ggUser');
+      const res = await fetch(`${backendUrl}/api/goals`);
+      const allGoals = await res.json();
+      const goals = allGoals.filter(g => g.userId === user);
+      const list = document.getElementById('goalList');
+      list.innerHTML = "";
+      goals.forEach((goal) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          ${goal.title}
+          <button onclick="editGoal('${goal._id}', '${goal.title}')">Edit</button>
+          <button onclick="deleteGoal('${goal._id}')">Delete</button>`;
+        list.appendChild(li);
+      });
+    }
+  
+    async function editGoal(id, oldText) {
+      const newGoal = prompt("Edit your goal:", oldText);
+      if (newGoal !== null && newGoal.trim()) {
+        await fetch(`${backendUrl}/api/goals/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: newGoal.trim() })
+        });
+        loadGoals();
+      }
+    }
+  
+    async function deleteGoal(id) {
+      await fetch(`${backendUrl}/api/goals/${id}`, {
+        method: "DELETE"
+      });
+      loadGoals();
+    }
+  
+    function fetchQuote() {
+      fetch(`${backendUrl}/api/quote`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("quote").textContent =
+            `"${data.q}" – ${data.a}`;
+        })
+        .catch(() => {
+          document.getElementById("quote").textContent =
+            "Stay focused and keep working on your goals.";
+        });
+    }
+  
+    if (localStorage.getItem("ggUser")) loadDashboard();
+  </script>
+  
